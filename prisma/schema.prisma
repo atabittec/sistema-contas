@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum EntryType {
+  INCOME
+  EXPENSE
+}
+
+enum Person {
+  ANDRE
+  USUARIA
+  CASAL
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Category {
+  id             String          @id @default(cuid())
+  name           String
+  type           EntryType
+  color          String?
+  recurringItems RecurringItem[]
+  transactions   Transaction[]
+
+  @@unique([name, type])
+}
+
+model RecurringItem {
+  id            String        @id @default(cuid())
+  name          String
+  type          EntryType
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  defaultAmount Float
+  dayOfMonth    Int?
+  person        Person        @default(CASAL)
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id              String         @id @default(cuid())
+  description     String
+  amount          Float
+  type            EntryType
+  categoryId      String
+  category        Category       @relation(fields: [categoryId], references: [id])
+  person          Person         @default(CASAL)
+  competenceMonth String
+  dueDate         DateTime?
+  paid            Boolean        @default(false)
+  cardName        String?
+  notes           String?
+  recurringItemId String?
+  recurringItem   RecurringItem? @relation(fields: [recurringItemId], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([competenceMonth])
+  @@index([type])
+}
