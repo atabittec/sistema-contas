@@ -1,5 +1,6 @@
 import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
 import {
+  ensureMonthlyTransactions,
   getExpenseByCategory,
   getMonthSummary,
   getMonthlySeries,
@@ -17,6 +18,10 @@ export default async function DashboardPage({
 }) {
   const params = await searchParams;
   const month = params.month ?? currentCompetenceMonth();
+
+  if (month === currentCompetenceMonth()) {
+    await ensureMonthlyTransactions(month);
+  }
 
   const [summary, series, categories] = await Promise.all([
     getMonthSummary(month),
