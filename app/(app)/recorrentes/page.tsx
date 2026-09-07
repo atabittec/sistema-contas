@@ -14,7 +14,7 @@ export default async function RecorrentesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-slate-900">
+      <h1 className="text-xl font-semibold text-slate-900">
         Contas fixas e recorrentes
       </h1>
       <p className="max-w-2xl text-sm text-slate-500">
@@ -24,17 +24,17 @@ export default async function RecorrentesPage() {
         mês&quot; no painel.
       </p>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-3 text-sm font-semibold text-slate-700">
           Nova conta fixa / recorrente
         </h2>
         <RecurringItemForm categories={categories} />
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-left text-slate-500">
+            <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
               <th className="px-4 py-2 font-medium">Nome</th>
               <th className="px-4 py-2 font-medium">Categoria</th>
               <th className="px-4 py-2 font-medium">Responsável</th>
@@ -46,7 +46,7 @@ export default async function RecorrentesPage() {
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.id} className="border-b border-slate-100 last:border-0">
+              <tr key={item.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60 transition-colors">
                 <td className="px-4 py-2 font-medium text-slate-800">
                   {item.name}
                 </td>
@@ -58,7 +58,7 @@ export default async function RecorrentesPage() {
                 </td>
                 <td
                   className={`px-4 py-2 font-medium ${
-                    item.type === "INCOME" ? "text-emerald-700" : "text-red-700"
+                    item.type === "INCOME" ? "text-emerald-700" : "text-rose-700"
                   }`}
                 >
                   {formatCurrency(item.defaultAmount)}
@@ -91,7 +91,7 @@ export default async function RecorrentesPage() {
                     <input type="hidden" name="id" value={item.id} />
                     <button
                       type="submit"
-                      className="text-red-500 hover:text-red-700"
+                      className="font-medium text-rose-500 hover:text-rose-700"
                     >
                       Excluir
                     </button>

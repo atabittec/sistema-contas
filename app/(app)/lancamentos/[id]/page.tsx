@@ -21,8 +21,8 @@ export default async function EditarLancamentoPage({
 
   return (
     <div className="max-w-2xl space-y-4">
-      <h1 className="text-lg font-semibold text-slate-900">Editar lançamento</h1>
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <h1 className="text-xl font-semibold text-slate-900">Editar lançamento</h1>
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <TransactionForm
           action={boundAction}
           categories={categories}

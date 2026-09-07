@@ -14,7 +14,7 @@ export default async function CategoriasPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-slate-900">Categorias</h1>
+      <h1 className="text-xl font-semibold text-slate-900">Categorias</h1>
 
       {params.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -22,7 +22,7 @@ export default async function CategoriasPage({
         </p>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <CategoryForm />
       </div>
 
@@ -42,7 +42,7 @@ function CategoryList({
   categories: { id: string; name: string }[];
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="mb-3 text-sm font-semibold text-slate-700">{title}</h2>
       <ul className="divide-y divide-slate-100">
         {categories.map((c) => (
@@ -52,7 +52,7 @@ function CategoryList({
               <input type="hidden" name="id" value={c.id} />
               <button
                 type="submit"
-                className="text-sm text-red-500 hover:text-red-700"
+                className="text-sm font-medium text-rose-500 hover:text-rose-700"
               >
                 Excluir
               </button>

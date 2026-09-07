@@ -22,7 +22,7 @@ export default async function CartoesPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-lg font-semibold text-slate-900">Cartões</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Cartões</h1>
         <MonthSwitcher month={month} basePath="/cartoes" />
       </div>
 
@@ -44,15 +44,15 @@ export default async function CartoesPage({
           {totals.map((c) => (
             <div
               key={c.cardName}
-              className="rounded-xl border border-slate-200 bg-white p-4"
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <p className="text-sm text-slate-500">{c.cardName}</p>
-              <p className="mt-1 text-xl font-semibold text-red-700">
+              <p className="mt-1 text-xl font-semibold text-rose-700">
                 {formatCurrency(c.total)}
               </p>
             </div>
           ))}
-          <div className="rounded-xl border border-slate-300 bg-slate-50 p-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <p className="text-sm text-slate-500">Total em cartões</p>
             <p className="mt-1 text-xl font-semibold text-slate-900">
               {formatCurrency(grandTotal)}
@@ -61,10 +61,10 @@ export default async function CartoesPage({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-left text-slate-500">
+            <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
               <th className="px-4 py-2 font-medium">Cartão</th>
               <th className="px-4 py-2 font-medium">Descrição</th>
               <th className="px-4 py-2 font-medium">Valor</th>
@@ -80,16 +80,16 @@ export default async function CartoesPage({
               </tr>
             )}
             {cardTransactions.map((t) => (
-              <tr key={t.id} className="border-b border-slate-100 last:border-0">
+              <tr key={t.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60 transition-colors">
                 <td className="px-4 py-2 text-slate-800">{t.cardName}</td>
                 <td className="px-4 py-2 text-slate-600">{t.description}</td>
-                <td className="px-4 py-2 font-medium text-red-700">
+                <td className="px-4 py-2 font-medium text-rose-700">
                   {formatCurrency(t.amount)}
                 </td>
                 <td className="px-4 py-2 text-right">
                   <Link
                     href={`/lancamentos/${t.id}`}
-                    className="text-slate-500 hover:text-slate-900"
+                    className="font-medium text-brand hover:text-brand-dark"
                   >
                     Editar
                   </Link>

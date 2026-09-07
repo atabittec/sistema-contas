@@ -24,7 +24,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
           name="name"
           required
           placeholder="Ex: Academia"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -36,7 +36,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
           name="categoryId"
           required
           defaultValue=""
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         >
           <option value="" disabled>
             Selecione...
@@ -69,7 +69,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
         <select
           name="person"
           defaultValue="CASAL"
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         >
           <option value="CASAL">Casal</option>
           <option value="ANDRE">André</option>
@@ -87,7 +87,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
           step="0.01"
           min="0.01"
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -101,7 +101,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
           min="1"
           max="28"
           placeholder="Ex: 10"
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -115,7 +115,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-colors hover:bg-brand-dark disabled:opacity-60"
         >
           {pending ? "Salvando..." : "Adicionar"}
         </button>

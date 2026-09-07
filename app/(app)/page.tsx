@@ -1,3 +1,4 @@
+import { ArrowDownCircle, ArrowUpCircle, Scale, Sparkles } from "lucide-react";
 import {
   getExpenseByCategory,
   getMonthSummary,
@@ -28,7 +29,7 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-lg font-semibold text-slate-900">Painel</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Painel</h1>
         <MonthSwitcher month={month} basePath="/" />
       </div>
 
@@ -36,31 +37,43 @@ export default async function DashboardPage({
         <input type="hidden" name="month" value={month} />
         <button
           type="submit"
-          className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-brand/40 hover:text-brand"
         >
+          <Sparkles size={16} />
           Gerar lançamentos fixos do mês
         </button>
       </form>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <SummaryCard label="Entradas" value={summary.income} tone="income" />
-        <SummaryCard label="Saídas" value={summary.expense} tone="expense" />
+        <SummaryCard
+          label="Entradas"
+          value={summary.income}
+          tone="income"
+          icon={ArrowUpCircle}
+        />
+        <SummaryCard
+          label="Saídas"
+          value={summary.expense}
+          tone="expense"
+          icon={ArrowDownCircle}
+        />
         <SummaryCard
           label="Saldo"
           value={summary.balance}
           tone={balancePositive ? "income" : "expense"}
+          icon={Scale}
         />
       </div>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Entradas x Saídas (últimos 12 meses)
         </h2>
         <IncomeExpenseChart data={series} />
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-slate-700">
           Gastos por categoria no mês
         </h2>
         {categories.length === 0 ? (
@@ -79,21 +92,33 @@ function SummaryCard({
   label,
   value,
   tone,
+  icon: Icon,
 }: {
   label: string;
   value: number;
   tone: "income" | "expense";
+  icon: React.ComponentType<{ size?: number }>;
 }) {
+  const isIncome = tone === "income";
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p
-        className={`mt-1 text-2xl font-semibold ${
-          tone === "income" ? "text-emerald-700" : "text-red-700"
+    <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <span
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+          isIncome ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
         }`}
       >
-        {formatCurrency(value)}
-      </p>
+        <Icon size={22} />
+      </span>
+      <div>
+        <p className="text-sm text-slate-500">{label}</p>
+        <p
+          className={`mt-0.5 text-2xl font-semibold ${
+            isIncome ? "text-emerald-700" : "text-rose-700"
+          }`}
+        >
+          {formatCurrency(value)}
+        </p>
+      </div>
     </div>
   );
 }

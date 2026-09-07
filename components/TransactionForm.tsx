@@ -42,7 +42,7 @@ export function TransactionForm({
           name="description"
           defaultValue={defaultValues?.description}
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -57,7 +57,7 @@ export function TransactionForm({
           min="0.01"
           defaultValue={defaultValues?.amount}
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -69,7 +69,7 @@ export function TransactionForm({
           name="categoryId"
           defaultValue={defaultValues?.categoryId}
           required
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         >
           <option value="" disabled>
             Selecione...
@@ -102,7 +102,7 @@ export function TransactionForm({
         <select
           name="person"
           defaultValue={defaultValues?.person ?? "CASAL"}
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         >
           <option value="CASAL">Casal</option>
           <option value="ANDRE">André</option>
@@ -119,7 +119,7 @@ export function TransactionForm({
           type="month"
           defaultValue={defaultValues?.competenceMonth}
           required
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -131,7 +131,7 @@ export function TransactionForm({
           name="dueDate"
           type="date"
           defaultValue={defaultValues?.dueDate}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -143,7 +143,7 @@ export function TransactionForm({
           name="cardName"
           defaultValue={defaultValues?.cardName}
           placeholder="Ex: Nubank, Itaú..."
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -154,7 +154,7 @@ export function TransactionForm({
         <input
           name="notes"
           defaultValue={defaultValues?.notes}
-          className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -179,7 +179,7 @@ export function TransactionForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-colors hover:bg-brand-dark disabled:opacity-60"
         >
           {pending ? "Salvando..." : submitLabel}
         </button>
