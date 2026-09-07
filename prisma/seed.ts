@@ -4,8 +4,8 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const USERS = [
-  { name: "Usuária", username: "usuaria", password: "Florluz971!" },
-  { name: "André", username: "andre", password: "Florrio676!" },
+  { name: "Paula", username: "paula", password: "frigerio123" },
+  { name: "André", username: "andre", password: "pezzoti123" },
 ];
 
 const EXPENSE_CATEGORIES = [
@@ -52,8 +52,8 @@ async function main() {
   }
 
   console.log("Seed concluído.");
-  console.log("Login usuária -> usuário: usuaria | senha: Florluz971!");
-  console.log("Login André   -> usuário: andre   | senha: Florrio676!");
+  console.log("Login Paula -> usuário: paula | senha: frigerio123");
+  console.log("Login André -> usuário: andre | senha: pezzoti123");
 }
 
 main()
