@@ -1,4 +1,4 @@
-import { ArrowDownCircle, ArrowUpCircle, Scale, Sparkles } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
 import {
   getExpenseByCategory,
   getMonthSummary,
@@ -8,7 +8,7 @@ import { currentCompetenceMonth, formatCurrency } from "@/lib/format";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryBarChart } from "@/components/charts/CategoryBarChart";
-import { generateMonthlyTransactionsAction } from "./dashboard-actions";
+import { GenerateRecurringButton } from "@/components/GenerateRecurringButton";
 
 export default async function DashboardPage({
   searchParams,
@@ -33,16 +33,7 @@ export default async function DashboardPage({
         <MonthSwitcher month={month} basePath="/" />
       </div>
 
-      <form action={generateMonthlyTransactionsAction}>
-        <input type="hidden" name="month" value={month} />
-        <button
-          type="submit"
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-brand/40 hover:text-brand"
-        >
-          <Sparkles size={16} />
-          Gerar lançamentos fixos do mês
-        </button>
-      </form>
+      <GenerateRecurringButton month={month} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <SummaryCard
