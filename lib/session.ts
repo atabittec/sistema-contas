@@ -2,11 +2,13 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const secretKey = process.env.SESSION_SECRET;
-if (!secretKey) {
-  throw new Error("SESSION_SECRET não configurado no .env");
+function getEncodedKey() {
+  const secretKey = process.env.SESSION_SECRET;
+  if (!secretKey) {
+    throw new Error("SESSION_SECRET não configurado no .env");
+  }
+  return new TextEncoder().encode(secretKey);
 }
-const encodedKey = new TextEncoder().encode(secretKey);
 
 const SESSION_COOKIE = "session";
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
@@ -22,7 +24,7 @@ export async function encrypt(payload: SessionPayload) {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(encodedKey);
+    .sign(getEncodedKey());
 }
 
 export async function decrypt(
@@ -30,7 +32,7 @@ export async function decrypt(
 ): Promise<SessionPayload | null> {
   if (!session) return null;
   try {
-    const { payload } = await jwtVerify(session, encodedKey, {
+    const { payload } = await jwtVerify(session, getEncodedKey(), {
       algorithms: ["HS256"],
     });
     return payload as unknown as SessionPayload;
