@@ -127,7 +127,7 @@ function SummaryCard({
       <div>
         <p className="text-sm text-slate-500">{label}</p>
         <p
-          className={`mt-0.5 text-2xl font-semibold ${styles.text}`}
+          className={`mt-0.5 whitespace-nowrap text-2xl font-semibold lg:text-xl ${styles.text}`}
         >
           {formatCurrency(value)}
         </p>

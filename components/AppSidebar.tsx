@@ -33,7 +33,7 @@ export function AppSidebar({
   logoutAction: () => Promise<void>;
 }) {
   return (
-    <aside className="hidden h-full w-64 shrink-0 flex-col bg-slate-900 text-slate-300 md:flex">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-slate-900 text-slate-300 md:flex">
       <div className="flex items-center gap-2 px-6 py-5">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white">
           <Wallet size={18} />
