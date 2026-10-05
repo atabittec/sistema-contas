@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getCategories, getTransactions } from "@/lib/data";
-import { currentCompetenceMonth, formatCurrency, PERSON_LABELS } from "@/lib/format";
+import { currentCompetenceMonth, PERSON_LABELS } from "@/lib/format";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
+import { AmountInput } from "@/components/AmountInput";
 import { deleteTransactionAction, togglePaidAction } from "./actions";
 import { Person, EntryType } from "@prisma/client";
 
@@ -115,13 +116,13 @@ export default async function LancamentosPage({
                 <td className="px-4 py-2 text-slate-600">
                   {PERSON_LABELS[t.person]}
                 </td>
-                <td
-                  className={`px-4 py-2 font-medium ${
-                    t.type === "INCOME" ? "text-emerald-700" : "text-rose-700"
-                  }`}
-                >
-                  {t.type === "EXPENSE" ? "-" : "+"}
-                  {formatCurrency(t.amount)}
+                <td className="px-4 py-2">
+                  <AmountInput
+                    key={`${t.id}-${t.amount}`}
+                    id={t.id}
+                    amount={t.amount}
+                    tone={t.type === "INCOME" ? "income" : "expense"}
+                  />
                 </td>
                 <td className="px-4 py-2">
                   <form action={togglePaidAction}>

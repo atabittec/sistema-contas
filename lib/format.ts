@@ -6,14 +6,29 @@ export function formatCurrency(value: number) {
 }
 
 // O servidor roda em UTC; o mês "atual" é sempre o de Brasília.
-const competenceMonthFormatter = new Intl.DateTimeFormat("en-CA", {
+export function currentCompetenceMonth() {
+  return todayInBrazil().slice(0, 7);
+}
+
+/** Data de hoje em Brasília, no formato AAAA-MM-DD. */
+export function todayInBrazil() {
+  return dayFormatter.format(new Date());
+}
+
+const dayFormatter = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Sao_Paulo",
   year: "numeric",
   month: "2-digit",
+  day: "2-digit",
 });
 
-export function currentCompetenceMonth() {
-  return competenceMonthFormatter.format(new Date()).slice(0, 7);
+/** Vencimentos são gravados como meia-noite UTC; mostra só dia/mês. */
+export function formatDueDate(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
 }
 
 export function formatCompetenceMonth(competenceMonth: string) {

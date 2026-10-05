@@ -20,8 +20,9 @@ export default async function RecorrentesPage() {
       <p className="max-w-2xl text-sm text-slate-500">
         Cadastre aqui as contas que se repetem todo mês (academia, água,
         energia, condomínio, salários...). Elas geram automaticamente um
-        lançamento por mês através do botão &quot;Gerar lançamentos fixos do
-        mês&quot; no painel.
+        lançamento por mês ao abrir o painel. O primeiro mês usa o valor
+        padrão; nos seguintes, o sistema repete o valor do mês anterior, que
+        pode ser ajustado direto na lista de lançamentos.
       </p>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

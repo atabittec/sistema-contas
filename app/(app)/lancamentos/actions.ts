@@ -127,6 +127,27 @@ export async function deleteTransactionAction(formData: FormData) {
   if (month) redirect(`/lancamentos?month=${month}`);
 }
 
+export async function updateAmountAction(
+  id: string,
+  amount: number
+): Promise<{ error?: string }> {
+  await verifySession();
+  const parsed = z.number().positive().safeParse(amount);
+  if (!id || !parsed.success) {
+    return { error: "Valor inválido." };
+  }
+
+  await prisma.transaction.update({
+    where: { id },
+    data: { amount: Math.round(parsed.data * 100) / 100 },
+  });
+
+  revalidatePath("/lancamentos");
+  revalidatePath("/");
+  revalidatePath("/cartoes");
+  return {};
+}
+
 export async function togglePaidAction(formData: FormData) {
   await verifySession();
   const id = String(formData.get("id") ?? "");

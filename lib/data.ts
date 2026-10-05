@@ -35,13 +35,30 @@ export async function ensureMonthlyTransactions(competenceMonth: string) {
   const toCreate = activeItems.filter((item) => !generatedIds.has(item.id));
   if (toCreate.length === 0) return 0;
 
+  // Contas como luz e água variam: usa o valor do último mês anterior
+  // lançado para a conta; sem histórico, o valor padrão.
+  const previous = await prisma.transaction.findMany({
+    where: {
+      recurringItemId: { in: toCreate.map((i) => i.id) },
+      competenceMonth: { lt: competenceMonth },
+    },
+    orderBy: [{ competenceMonth: "desc" }, { createdAt: "desc" }],
+    select: { recurringItemId: true, amount: true },
+  });
+  const lastAmount = new Map<string, number>();
+  for (const p of previous) {
+    if (p.recurringItemId && !lastAmount.has(p.recurringItemId)) {
+      lastAmount.set(p.recurringItemId, p.amount);
+    }
+  }
+
   const [year, month] = competenceMonth.split("-").map(Number);
 
   await prisma.$transaction([
     prisma.transaction.createMany({
       data: toCreate.map((item) => ({
         description: item.name,
-        amount: item.defaultAmount,
+        amount: lastAmount.get(item.id) ?? item.defaultAmount,
         type: item.type,
         categoryId: item.categoryId,
         person: item.person,
@@ -96,6 +113,30 @@ export async function getMonthSummary(competenceMonth: string) {
   const expense = rows.find((r) => r.type === EntryType.EXPENSE)?._sum.amount ?? 0;
 
   return { income, expense, balance: income - expense };
+}
+
+/** Despesas ainda não pagas do mês, com vencimento primeiro. */
+export async function getPendingExpenses(competenceMonth: string) {
+  const items = await prisma.transaction.findMany({
+    where: { competenceMonth, type: EntryType.EXPENSE, paid: false },
+    select: {
+      id: true,
+      description: true,
+      amount: true,
+      dueDate: true,
+      paid: true,
+      cardName: true,
+    },
+  });
+
+  // Sem vencimento vai para o fim da lista.
+  items.sort(
+    (a, b) =>
+      (a.dueDate?.getTime() ?? Infinity) - (b.dueDate?.getTime() ?? Infinity)
+  );
+
+  const total = items.reduce((sum, t) => sum + t.amount, 0);
+  return { items, total };
 }
 
 export async function getMonthlySeries(months = 12) {

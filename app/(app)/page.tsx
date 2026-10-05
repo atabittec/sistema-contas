@@ -1,11 +1,19 @@
-import { ArrowDownCircle, ArrowUpCircle, Scale } from "lucide-react";
+import Link from "next/link";
+import { ArrowDownCircle, ArrowUpCircle, Clock, Scale } from "lucide-react";
 import {
   ensureMonthlyTransactions,
   getExpenseByCategory,
   getMonthSummary,
   getMonthlySeries,
+  getPendingExpenses,
 } from "@/lib/data";
-import { currentCompetenceMonth, formatCurrency } from "@/lib/format";
+import {
+  currentCompetenceMonth,
+  formatCurrency,
+  formatDueDate,
+  todayInBrazil,
+} from "@/lib/format";
+import { togglePaidAction } from "./lancamentos/actions";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryBarChart } from "@/components/charts/CategoryBarChart";
@@ -23,10 +31,11 @@ export default async function DashboardPage({
     await ensureMonthlyTransactions(month);
   }
 
-  const [summary, series, categories] = await Promise.all([
+  const [summary, series, categories, pending] = await Promise.all([
     getMonthSummary(month),
     getMonthlySeries(12),
     getExpenseByCategory(month),
+    getPendingExpenses(month),
   ]);
 
   const balancePositive = summary.balance >= 0;
@@ -40,7 +49,7 @@ export default async function DashboardPage({
 
       <GenerateRecurringButton month={month} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
           label="Entradas"
           value={summary.income}
@@ -59,7 +68,15 @@ export default async function DashboardPage({
           tone={balancePositive ? "income" : "expense"}
           icon={Scale}
         />
+        <SummaryCard
+          label="A pagar"
+          value={pending.total}
+          tone="pending"
+          icon={Clock}
+        />
       </div>
+
+      <PendingList month={month} items={pending.items} />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-slate-700">
@@ -92,29 +109,123 @@ function SummaryCard({
 }: {
   label: string;
   value: number;
-  tone: "income" | "expense";
+  tone: "income" | "expense" | "pending";
   icon: React.ComponentType<{ size?: number }>;
 }) {
-  const isIncome = tone === "income";
+  const styles = {
+    income: { icon: "bg-emerald-50 text-emerald-600", text: "text-emerald-700" },
+    expense: { icon: "bg-rose-50 text-rose-600", text: "text-rose-700" },
+    pending: { icon: "bg-amber-50 text-amber-600", text: "text-amber-700" },
+  }[tone];
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <span
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-          isIncome ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
-        }`}
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${styles.icon}`}
       >
         <Icon size={22} />
       </span>
       <div>
         <p className="text-sm text-slate-500">{label}</p>
         <p
-          className={`mt-0.5 text-2xl font-semibold ${
-            isIncome ? "text-emerald-700" : "text-rose-700"
-          }`}
+          className={`mt-0.5 text-2xl font-semibold ${styles.text}`}
         >
           {formatCurrency(value)}
         </p>
       </div>
     </div>
   );
+}
+
+const PENDING_LIMIT = 8;
+
+function PendingList({
+  month,
+  items,
+}: {
+  month: string;
+  items: Awaited<ReturnType<typeof getPendingExpenses>>["items"];
+}) {
+  const today = todayInBrazil();
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold text-slate-700">Contas a pagar</h2>
+        {items.length > 0 && (
+          <Link
+            href={`/lancamentos?month=${month}&type=EXPENSE`}
+            className="text-sm font-medium text-brand hover:text-brand-dark"
+          >
+            Ver todas
+          </Link>
+        )}
+      </div>
+
+      {items.length === 0 ? (
+        <p className="text-sm text-slate-500">Tudo pago neste mês.</p>
+      ) : (
+        <ul className="divide-y divide-slate-100">
+          {items.slice(0, PENDING_LIMIT).map((t) => {
+            const due = dueStatus(t.dueDate, today);
+            return (
+              <li key={t.id} className="flex items-center gap-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-slate-800">
+                    {t.description}
+                  </p>
+                  <p className={`text-xs ${due.className}`}>{due.label}</p>
+                </div>
+                <span className="font-medium text-rose-700">
+                  {formatCurrency(t.amount)}
+                </span>
+                <form action={togglePaidAction}>
+                  <input type="hidden" name="id" value={t.id} />
+                  <input type="hidden" name="paid" value="false" />
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                  >
+                    Marcar pago
+                  </button>
+                </form>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {items.length > PENDING_LIMIT && (
+        <p className="mt-2 text-xs text-slate-400">
+          E mais {items.length - PENDING_LIMIT} conta(s) pendente(s).
+        </p>
+      )}
+    </section>
+  );
+}
+
+function dueStatus(dueDate: Date | null, today: string) {
+  if (!dueDate) {
+    return { label: "Sem vencimento", className: "text-slate-400" };
+  }
+  const due = dueDate.toISOString().slice(0, 10);
+  const days = Math.round(
+    (Date.parse(due) - Date.parse(today)) / (24 * 60 * 60 * 1000)
+  );
+  const date = formatDueDate(dueDate);
+
+  if (days < 0) {
+    return {
+      label: `Venceu em ${date} (${-days} dia${days === -1 ? "" : "s"} atrás)`,
+      className: "font-medium text-rose-600",
+    };
+  }
+  if (days === 0) {
+    return { label: `Vence hoje (${date})`, className: "font-medium text-amber-600" };
+  }
+  if (days <= 7) {
+    return {
+      label: `Vence em ${days} dia${days === 1 ? "" : "s"} (${date})`,
+      className: "text-amber-600",
+    };
+  }
+  return { label: `Vence em ${date}`, className: "text-slate-400" };
 }
