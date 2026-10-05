@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCategories } from "@/lib/data";
+import { getCardNames, getCategories } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import { TransactionForm } from "@/components/TransactionForm";
 import { updateTransactionAction } from "../actions";
@@ -10,9 +10,10 @@ export default async function EditarLancamentoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [transaction, categories] = await Promise.all([
+  const [transaction, categories, cardNames] = await Promise.all([
     prisma.transaction.findUnique({ where: { id } }),
     getCategories(),
+    getCardNames(),
   ]);
 
   if (!transaction) notFound();
@@ -26,6 +27,7 @@ export default async function EditarLancamentoPage({
         <TransactionForm
           action={boundAction}
           categories={categories}
+          cardNames={cardNames}
           defaultValues={{
             description: transaction.description,
             amount: transaction.amount,

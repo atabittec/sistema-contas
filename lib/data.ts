@@ -179,6 +179,31 @@ export async function getExpenseByCategory(competenceMonth: string) {
     .sort((a, b) => b.total - a.total);
 }
 
+/** Nomes de cartão já usados, para sugerir no formulário. */
+export async function getCardNames() {
+  const rows = await prisma.transaction.findMany({
+    where: { cardName: { not: null } },
+    distinct: ["cardName"],
+    select: { cardName: true },
+    orderBy: { cardName: "asc" },
+  });
+  return rows.map((r) => r.cardName as string);
+}
+
+/**
+ * Usa a grafia de um cartão já existente ("nubank " vira "Nubank"),
+ * para não separar o mesmo cartão em dois.
+ */
+export async function normalizeCardName(cardName: string | undefined) {
+  const name = cardName?.trim().replace(/\s+/g, " ");
+  if (!name) return null;
+  const existing = await getCardNames();
+  return (
+    existing.find((c) => c.toLocaleLowerCase("pt-BR") === name.toLocaleLowerCase("pt-BR")) ??
+    name
+  );
+}
+
 export async function getCardTotals(competenceMonth: string) {
   const rows = await prisma.transaction.findMany({
     where: {

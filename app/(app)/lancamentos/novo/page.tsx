@@ -1,4 +1,4 @@
-import { getCategories } from "@/lib/data";
+import { getCardNames, getCategories } from "@/lib/data";
 import { currentCompetenceMonth } from "@/lib/format";
 import { TransactionForm } from "@/components/TransactionForm";
 import { createTransactionAction } from "../actions";
@@ -10,7 +10,10 @@ export default async function NovoLancamentoPage({
 }) {
   const params = await searchParams;
   const month = params.month ?? currentCompetenceMonth();
-  const categories = await getCategories();
+  const [categories, cardNames] = await Promise.all([
+    getCategories(),
+    getCardNames(),
+  ]);
 
   return (
     <div className="max-w-2xl space-y-4">
@@ -19,6 +22,7 @@ export default async function NovoLancamentoPage({
         <TransactionForm
           action={createTransactionAction}
           categories={categories}
+          cardNames={cardNames}
           defaultValues={{ competenceMonth: month, person: "CASAL" }}
           submitLabel="Criar lançamento"
         />

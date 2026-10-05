@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
+import { normalizeCardName } from "@/lib/data";
 import { Person } from "@prisma/client";
 
 const TransactionSchema = z.object({
@@ -61,7 +62,7 @@ export async function createTransactionAction(
       person: parsed.data.person,
       competenceMonth: parsed.data.competenceMonth,
       dueDate: parsed.data.dueDate ? new Date(parsed.data.dueDate) : null,
-      cardName: parsed.data.cardName || null,
+      cardName: await normalizeCardName(parsed.data.cardName),
       notes: parsed.data.notes || null,
       paid: parsed.data.paid ?? false,
     },
@@ -101,7 +102,7 @@ export async function updateTransactionAction(
       person: parsed.data.person,
       competenceMonth: parsed.data.competenceMonth,
       dueDate: parsed.data.dueDate ? new Date(parsed.data.dueDate) : null,
-      cardName: parsed.data.cardName || null,
+      cardName: await normalizeCardName(parsed.data.cardName),
       notes: parsed.data.notes || null,
       paid: parsed.data.paid ?? false,
     },

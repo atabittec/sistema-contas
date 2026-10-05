@@ -19,6 +19,7 @@ type DefaultValues = {
 export function TransactionForm({
   action,
   categories,
+  cardNames = [],
   defaultValues,
   submitLabel = "Salvar",
 }: {
@@ -27,6 +28,7 @@ export function TransactionForm({
     formData: FormData
   ) => Promise<TransactionFormState>;
   categories: Category[];
+  cardNames?: string[];
   defaultValues?: DefaultValues;
   submitLabel?: string;
 }) {
@@ -67,7 +69,7 @@ export function TransactionForm({
         </label>
         <select
           name="categoryId"
-          defaultValue={defaultValues?.categoryId}
+          defaultValue={defaultValues?.categoryId ?? ""}
           required
           className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         >
@@ -141,10 +143,17 @@ export function TransactionForm({
         </label>
         <input
           name="cardName"
+          list="card-names"
+          autoComplete="off"
           defaultValue={defaultValues?.cardName}
           placeholder="Ex: Nubank, Itaú..."
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
+        <datalist id="card-names">
+          {cardNames.map((name) => (
+            <option key={name} value={name} />
+          ))}
+        </datalist>
       </div>
 
       <div className="sm:col-span-2">
