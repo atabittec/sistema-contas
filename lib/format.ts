@@ -5,9 +5,15 @@ export function formatCurrency(value: number) {
   }).format(value);
 }
 
+// O servidor roda em UTC; o mês "atual" é sempre o de Brasília.
+const competenceMonthFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Sao_Paulo",
+  year: "numeric",
+  month: "2-digit",
+});
+
 export function currentCompetenceMonth() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  return competenceMonthFormatter.format(new Date()).slice(0, 7);
 }
 
 export function formatCompetenceMonth(competenceMonth: string) {
@@ -36,6 +42,6 @@ export function lastNCompetenceMonths(n: number, endMonth?: string) {
 
 export const PERSON_LABELS: Record<string, string> = {
   ANDRE: "André",
-  USUARIA: "Usuária",
+  USUARIA: "Paula",
   CASAL: "Casal",
 };
