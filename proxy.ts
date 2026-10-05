@@ -22,5 +22,8 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  // Manifesto e ícones precisam abrir sem login para instalar no celular.
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.png|icon-192.png|icon-512.png|icon-maskable-512.png|apple-icon.png).*)",
+  ],
 };
