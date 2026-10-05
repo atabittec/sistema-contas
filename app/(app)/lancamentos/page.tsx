@@ -53,7 +53,7 @@ export default async function LancamentosPage({
             <option value="">Todos</option>
             <option value="CASAL">Casal</option>
             <option value="ANDRE">André</option>
-            <option value="USUARIA">Usuária</option>
+            <option value="USUARIA">Paula</option>
           </select>
           <select
             name="categoryId"

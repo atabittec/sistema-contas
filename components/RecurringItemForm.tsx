@@ -73,7 +73,7 @@ export function RecurringItemForm({ categories }: { categories: Category[] }) {
         >
           <option value="CASAL">Casal</option>
           <option value="ANDRE">André</option>
-          <option value="USUARIA">Usuária</option>
+          <option value="USUARIA">Paula</option>
         </select>
       </div>
 
