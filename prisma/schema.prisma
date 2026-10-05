@@ -49,6 +49,19 @@ model RecurringItem {
   active        Boolean       @default(true)
   createdAt     DateTime      @default(now())
   transactions  Transaction[]
+  generations   RecurringGeneration[]
+}
+
+// Registra que a conta fixa já foi gerada no mês, para não recriar
+// lançamentos que o usuário apagou de propósito.
+model RecurringGeneration {
+  id              String        @id @default(cuid())
+  recurringItemId String
+  recurringItem   RecurringItem @relation(fields: [recurringItemId], references: [id], onDelete: Cascade)
+  competenceMonth String
+  createdAt       DateTime      @default(now())
+
+  @@unique([recurringItemId, competenceMonth])
 }
 
 model Transaction {

@@ -22,37 +22,45 @@ export async function ensureMonthlyTransactions(competenceMonth: string) {
     where: { active: true },
   });
 
-  const existing = await prisma.transaction.findMany({
+  // Já gerados neste mês (mesmo que o lançamento tenha sido apagado depois).
+  const generated = await prisma.recurringGeneration.findMany({
     where: {
       competenceMonth,
       recurringItemId: { in: activeItems.map((i) => i.id) },
     },
     select: { recurringItemId: true },
   });
-  const existingIds = new Set(existing.map((e) => e.recurringItemId));
+  const generatedIds = new Set(generated.map((g) => g.recurringItemId));
 
-  const toCreate = activeItems.filter((item) => !existingIds.has(item.id));
+  const toCreate = activeItems.filter((item) => !generatedIds.has(item.id));
   if (toCreate.length === 0) return 0;
 
-  await prisma.transaction.createMany({
-    data: toCreate.map((item) => ({
-      description: item.name,
-      amount: item.defaultAmount,
-      type: item.type,
-      categoryId: item.categoryId,
-      person: item.person,
-      competenceMonth,
-      paid: false,
-      recurringItemId: item.id,
-      dueDate: item.dayOfMonth
-        ? new Date(
-            Number(competenceMonth.split("-")[0]),
-            Number(competenceMonth.split("-")[1]) - 1,
-            item.dayOfMonth
-          )
-        : null,
-    })),
-  });
+  const [year, month] = competenceMonth.split("-").map(Number);
+
+  await prisma.$transaction([
+    prisma.transaction.createMany({
+      data: toCreate.map((item) => ({
+        description: item.name,
+        amount: item.defaultAmount,
+        type: item.type,
+        categoryId: item.categoryId,
+        person: item.person,
+        competenceMonth,
+        paid: false,
+        recurringItemId: item.id,
+        // Meia-noite UTC, igual às datas digitadas no formulário.
+        dueDate: item.dayOfMonth
+          ? new Date(Date.UTC(year, month - 1, item.dayOfMonth))
+          : null,
+      })),
+    }),
+    prisma.recurringGeneration.createMany({
+      data: toCreate.map((item) => ({
+        recurringItemId: item.id,
+        competenceMonth,
+      })),
+    }),
+  ]);
 
   return toCreate.length;
 }
