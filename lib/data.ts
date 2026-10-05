@@ -158,6 +158,55 @@ export async function getMonthlySeries(months = 12) {
   });
 }
 
+/** Entradas por pessoa em cada um dos últimos meses. */
+export async function getIncomeByPersonSeries(months = 12) {
+  const monthList = lastNCompetenceMonths(months);
+  const rows = await prisma.transaction.groupBy({
+    by: ["competenceMonth", "person"],
+    where: { competenceMonth: { in: monthList }, type: EntryType.INCOME },
+    _sum: { amount: true },
+  });
+
+  const sum = (month: string, person: Person) =>
+    rows.find((r) => r.competenceMonth === month && r.person === person)?._sum
+      .amount ?? 0;
+
+  return monthList.map((month) => ({
+    month,
+    ANDRE: sum(month, Person.ANDRE),
+    USUARIA: sum(month, Person.USUARIA),
+    CASAL: sum(month, Person.CASAL),
+  }));
+}
+
+/** Entradas do mês por pessoa e categoria (salário, bolsa, dividendos...). */
+export async function getMonthIncomeByPerson(competenceMonth: string) {
+  const [rows, categories] = await Promise.all([
+    prisma.transaction.groupBy({
+      by: ["person", "categoryId"],
+      where: { competenceMonth, type: EntryType.INCOME },
+      _sum: { amount: true },
+    }),
+    getCategories(EntryType.INCOME),
+  ]);
+
+  const people = [Person.ANDRE, Person.USUARIA, Person.CASAL]
+    .map((person) => {
+      const byCategory = Object.fromEntries(
+        categories.map((c) => [
+          c.id,
+          rows.find((r) => r.person === person && r.categoryId === c.id)?._sum
+            .amount ?? 0,
+        ])
+      );
+      const total = Object.values(byCategory).reduce((a, b) => a + b, 0);
+      return { person, byCategory, total };
+    })
+    .filter((p) => p.total > 0);
+
+  return { categories, people };
+}
+
 export async function getExpenseByCategory(competenceMonth: string) {
   const rows = await prisma.transaction.groupBy({
     by: ["categoryId"],

@@ -3,6 +3,8 @@ import { ArrowDownCircle, ArrowUpCircle, Clock, Scale } from "lucide-react";
 import {
   ensureMonthlyTransactions,
   getExpenseByCategory,
+  getIncomeByPersonSeries,
+  getMonthIncomeByPerson,
   getMonthSummary,
   getMonthlySeries,
   getPendingExpenses,
@@ -11,8 +13,11 @@ import {
   currentCompetenceMonth,
   formatCurrency,
   formatDueDate,
+  PERSON_LABELS,
   todayInBrazil,
 } from "@/lib/format";
+import { PERSON_COLORS } from "@/lib/chart-colors";
+import { IncomeByPersonChart } from "@/components/charts/IncomeByPersonChart";
 import { togglePaidAction } from "./lancamentos/actions";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
@@ -31,12 +36,15 @@ export default async function DashboardPage({
     await ensureMonthlyTransactions(month);
   }
 
-  const [summary, series, categories, pending] = await Promise.all([
-    getMonthSummary(month),
-    getMonthlySeries(12),
-    getExpenseByCategory(month),
-    getPendingExpenses(month),
-  ]);
+  const [summary, series, categories, pending, personSeries, personIncome] =
+    await Promise.all([
+      getMonthSummary(month),
+      getMonthlySeries(12),
+      getExpenseByCategory(month),
+      getPendingExpenses(month),
+      getIncomeByPersonSeries(12),
+      getMonthIncomeByPerson(month),
+    ]);
 
   const balancePositive = summary.balance >= 0;
 
@@ -83,6 +91,20 @@ export default async function DashboardPage({
           Entradas x Saídas (últimos 12 meses)
         </h2>
         <IncomeExpenseChart data={series} />
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-slate-700">
+          Entradas por pessoa (últimos 12 meses)
+        </h2>
+        {personSeries.every((d) => d.ANDRE + d.USUARIA + d.CASAL === 0) ? (
+          <p className="text-sm text-slate-500">
+            Nenhuma entrada lançada nos últimos 12 meses.
+          </p>
+        ) : (
+          <IncomeByPersonChart data={personSeries} />
+        )}
+        <PersonIncomeTable data={personIncome} />
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -228,4 +250,68 @@ function dueStatus(dueDate: Date | null, today: string) {
     };
   }
   return { label: `Vence em ${date}`, className: "text-slate-400" };
+}
+
+function PersonIncomeTable({
+  data,
+}: {
+  data: Awaited<ReturnType<typeof getMonthIncomeByPerson>>;
+}) {
+  if (data.people.length === 0) {
+    return (
+      <p className="mt-4 text-sm text-slate-500">
+        Nenhuma entrada lançada neste mês.
+      </p>
+    );
+  }
+
+  // Só as categorias que tiveram valor no mês, para a tabela caber no celular.
+  const categories = data.categories.filter((c) =>
+    data.people.some((p) => p.byCategory[c.id] > 0)
+  );
+
+  return (
+    <div className="mt-4 overflow-x-auto">
+      <table className="w-full text-sm">
+        <caption className="mb-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          Entradas deste mês
+        </caption>
+        <thead>
+          <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+            <th className="py-2 pr-4 font-medium">Pessoa</th>
+            {categories.map((c) => (
+              <th key={c.id} className="py-2 pr-4 text-right font-medium">
+                {c.name}
+              </th>
+            ))}
+            <th className="py-2 text-right font-medium">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.people.map((p) => (
+            <tr key={p.person} className="border-b border-slate-100 last:border-0">
+              <td className="py-2 pr-4 text-slate-800">
+                <span className="flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="h-2.5 w-2.5 rounded-sm"
+                    style={{ backgroundColor: PERSON_COLORS[p.person] }}
+                  />
+                  {PERSON_LABELS[p.person]}
+                </span>
+              </td>
+              {categories.map((c) => (
+                <td key={c.id} className="py-2 pr-4 text-right text-slate-600">
+                  {p.byCategory[c.id] > 0 ? formatCurrency(p.byCategory[c.id]) : "—"}
+                </td>
+              ))}
+              <td className="py-2 text-right font-medium text-slate-900">
+                {formatCurrency(p.total)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
