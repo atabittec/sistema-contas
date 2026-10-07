@@ -160,9 +160,11 @@ export default async function RelatoriosPage({
             Nenhuma entrada lançada em {year}.
           </p>
         ) : (
-          <IncomeByPersonChart data={personSeries} />
+          <>
+            <IncomeByPersonChart data={personSeries} />
+            <PersonIncomeTable data={personIncome} caption={`Entradas de ${year}`} />
+          </>
         )}
-        <PersonIncomeTable data={personIncome} caption={`Entradas de ${year}`} />
       </section>
 
       <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

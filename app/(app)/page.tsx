@@ -102,9 +102,13 @@ export default async function DashboardPage({
             Nenhuma entrada lançada nos últimos 12 meses.
           </p>
         ) : (
-          <IncomeByPersonChart data={personSeries} />
+          <>
+            <IncomeByPersonChart data={personSeries} />
+            {personIncome.people.length > 0 && (
+              <PersonIncomeTable data={personIncome} caption="Entradas deste mês" />
+            )}
+          </>
         )}
-        <PersonIncomeTable data={personIncome} caption="Entradas deste mês" />
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
