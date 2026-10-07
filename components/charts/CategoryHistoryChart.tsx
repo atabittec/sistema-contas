@@ -1,10 +1,9 @@
 "use client";
 
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
-  Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -13,14 +12,14 @@ import {
 import { formatCurrency, monthTickLabel } from "@/lib/format";
 import { CHART_COLORS } from "@/lib/chart-colors";
 
-type Point = { month: string; income: number; expense: number };
+type Point = { month: string; total: number };
 
-export function IncomeExpenseChart({ data }: { data: Point[] }) {
+export function CategoryHistoryChart({ data }: { data: Point[] }) {
   const chartData = data.map((d) => ({ ...d, label: monthTickLabel(d.month) }));
 
   return (
-    <ResponsiveContainer width="100%" height={280}>
-      <BarChart data={chartData} barGap={2} barCategoryGap="20%">
+    <ResponsiveContainer width="100%" height={260}>
+      <LineChart data={chartData}>
         <CartesianGrid
           vertical={false}
           stroke={CHART_COLORS.gridline}
@@ -47,27 +46,15 @@ export function IncomeExpenseChart({ data }: { data: Point[] }) {
             fontSize: 13,
           }}
         />
-        <Legend
-          formatter={(value) =>
-            value === "income" ? "Entradas" : "Saídas"
-          }
-          wrapperStyle={{ fontSize: 13, color: CHART_COLORS.secondaryInk }}
+        <Line
+          type="monotone"
+          dataKey="total"
+          stroke={CHART_COLORS.neutral}
+          strokeWidth={2}
+          dot={{ r: 4, fill: CHART_COLORS.neutral, strokeWidth: 0 }}
+          activeDot={{ r: 5 }}
         />
-        <Bar
-          dataKey="income"
-          name="income"
-          fill={CHART_COLORS.income}
-          radius={[4, 4, 0, 0]}
-          maxBarSize={24}
-        />
-        <Bar
-          dataKey="expense"
-          name="expense"
-          fill={CHART_COLORS.expense}
-          radius={[4, 4, 0, 0]}
-          maxBarSize={24}
-        />
-      </BarChart>
+      </LineChart>
     </ResponsiveContainer>
   );
 }

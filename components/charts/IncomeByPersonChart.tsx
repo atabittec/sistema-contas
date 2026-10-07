@@ -10,21 +10,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { formatCurrency, PERSON_LABELS } from "@/lib/format";
+import { formatCurrency, monthTickLabel, PERSON_LABELS } from "@/lib/format";
 import { CHART_COLORS, PERSON_COLORS } from "@/lib/chart-colors";
 
 type PersonKey = keyof typeof PERSON_COLORS;
 type Point = { month: string } & Record<PersonKey, number>;
 
 const PEOPLE: PersonKey[] = ["ANDRE", "USUARIA", "CASAL"];
-
-function monthTickLabel(month: string) {
-  const [year, m] = month.split("-").map(Number);
-  const date = new Date(year, m - 1, 1);
-  return new Intl.DateTimeFormat("pt-BR", { month: "short" })
-    .format(date)
-    .replace(".", "");
-}
 
 export function IncomeByPersonChart({ data }: { data: Point[] }) {
   const chartData = data.map((d) => ({ ...d, label: monthTickLabel(d.month) }));

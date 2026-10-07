@@ -1,5 +1,5 @@
 import { getCategories, getRecurringItems } from "@/lib/data";
-import { formatCurrency, PERSON_LABELS } from "@/lib/format";
+import { formatCompetenceMonth, formatCurrency, PERSON_LABELS } from "@/lib/format";
 import { RecurringItemForm } from "@/components/RecurringItemForm";
 import {
   deleteRecurringItemAction,
@@ -40,6 +40,7 @@ export default async function RecorrentesPage() {
               <th className="px-4 py-2 font-medium">Categoria</th>
               <th className="px-4 py-2 font-medium">Responsável</th>
               <th className="px-4 py-2 font-medium">Valor padrão</th>
+              <th className="px-4 py-2 font-medium">Último lançamento</th>
               <th className="px-4 py-2 font-medium">Dia</th>
               <th className="px-4 py-2 font-medium">Status</th>
               <th className="px-4 py-2 font-medium"></th>
@@ -63,6 +64,18 @@ export default async function RecorrentesPage() {
                   }`}
                 >
                   {formatCurrency(item.defaultAmount)}
+                </td>
+                <td className="px-4 py-2 text-slate-600">
+                  {item.last ? (
+                    <>
+                      {formatCurrency(item.last.amount)}{" "}
+                      <span className="text-xs text-slate-400">
+                        ({formatCompetenceMonth(item.last.competenceMonth)})
+                      </span>
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 <td className="px-4 py-2 text-slate-600">
                   {item.dayOfMonth ?? "-"}

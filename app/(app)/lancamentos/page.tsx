@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Download } from "lucide-react";
 import { getCategories, getTransactions } from "@/lib/data";
 import { currentCompetenceMonth, PERSON_LABELS } from "@/lib/format";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
@@ -14,6 +15,7 @@ export default async function LancamentosPage({
     person?: string;
     categoryId?: string;
     type?: string;
+    q?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -21,11 +23,18 @@ export default async function LancamentosPage({
   const person = params.person as Person | undefined;
   const categoryId = params.categoryId || undefined;
   const type = params.type as EntryType | undefined;
+  const q = params.q?.trim() || undefined;
 
   const [transactions, categories] = await Promise.all([
-    getTransactions({ competenceMonth: month, person, categoryId, type }),
+    getTransactions({ competenceMonth: month, person, categoryId, type, q }),
     getCategories(),
   ]);
+
+  const exportParams = new URLSearchParams({ month });
+  if (person) exportParams.set("person", person);
+  if (categoryId) exportParams.set("categoryId", categoryId);
+  if (type) exportParams.set("type", type);
+  if (q) exportParams.set("q", q);
 
   return (
     <div className="space-y-6">
@@ -37,6 +46,13 @@ export default async function LancamentosPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <form className="flex flex-wrap gap-2" action="/lancamentos" method="get">
           <input type="hidden" name="month" value={month} />
+          <input
+            type="search"
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Buscar por descrição..."
+            className="w-44 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+          />
           <select
             name="type"
             defaultValue={type ?? ""}
@@ -76,12 +92,21 @@ export default async function LancamentosPage({
           </button>
         </form>
 
-        <Link
-          href={`/lancamentos/novo?month=${month}`}
-          className="rounded-lg bg-brand px-3.5 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-colors hover:bg-brand-dark"
-        >
-          + Novo lançamento
-        </Link>
+        <div className="flex gap-2">
+          <a
+            href={`/api/export?${exportParams.toString()}`}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-brand/40 hover:text-brand"
+          >
+            <Download size={16} />
+            CSV
+          </a>
+          <Link
+            href={`/lancamentos/novo?month=${month}`}
+            className="rounded-lg bg-brand px-3.5 py-2 text-sm font-medium text-white shadow-sm shadow-brand/30 transition-colors hover:bg-brand-dark"
+          >
+            + Novo lançamento
+          </Link>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">

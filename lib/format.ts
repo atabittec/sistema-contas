@@ -31,6 +31,15 @@ export function formatDueDate(date: Date) {
   }).format(date);
 }
 
+/** Rótulo curto pro eixo dos gráficos ("jan", "fev"...). */
+export function monthTickLabel(competenceMonth: string) {
+  const [year, m] = competenceMonth.split("-").map(Number);
+  const date = new Date(year, m - 1, 1);
+  return new Intl.DateTimeFormat("pt-BR", { month: "short" })
+    .format(date)
+    .replace(".", "");
+}
+
 export function formatCompetenceMonth(competenceMonth: string) {
   const [year, month] = competenceMonth.split("-").map(Number);
   const date = new Date(year, month - 1, 1);
@@ -53,6 +62,18 @@ export function lastNCompetenceMonths(n: number, endMonth?: string) {
     months.push(shiftCompetenceMonth(end, -i));
   }
   return months;
+}
+
+export function currentYear() {
+  return Number(currentCompetenceMonth().slice(0, 4));
+}
+
+/** Os 12 meses de competência (AAAA-01 .. AAAA-12) de um ano. */
+export function monthsInYear(year: number) {
+  return Array.from(
+    { length: 12 },
+    (_, i) => `${year}-${String(i + 1).padStart(2, "0")}`
+  );
 }
 
 export const PERSON_LABELS: Record<string, string> = {

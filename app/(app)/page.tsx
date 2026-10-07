@@ -13,16 +13,16 @@ import {
   currentCompetenceMonth,
   formatCurrency,
   formatDueDate,
-  PERSON_LABELS,
   todayInBrazil,
 } from "@/lib/format";
-import { PERSON_COLORS } from "@/lib/chart-colors";
 import { IncomeByPersonChart } from "@/components/charts/IncomeByPersonChart";
 import { togglePaidAction } from "./lancamentos/actions";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { IncomeExpenseChart } from "@/components/charts/IncomeExpenseChart";
 import { CategoryBarChart } from "@/components/charts/CategoryBarChart";
 import { GenerateRecurringButton } from "@/components/GenerateRecurringButton";
+import { SummaryCard } from "@/components/SummaryCard";
+import { PersonIncomeTable } from "@/components/PersonIncomeTable";
 
 export default async function DashboardPage({
   searchParams,
@@ -104,7 +104,7 @@ export default async function DashboardPage({
         ) : (
           <IncomeByPersonChart data={personSeries} />
         )}
-        <PersonIncomeTable data={personIncome} />
+        <PersonIncomeTable data={personIncome} caption="Entradas deste mês" />
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -119,41 +119,6 @@ export default async function DashboardPage({
           <CategoryBarChart data={categories} />
         )}
       </section>
-    </div>
-  );
-}
-
-function SummaryCard({
-  label,
-  value,
-  tone,
-  icon: Icon,
-}: {
-  label: string;
-  value: number;
-  tone: "income" | "expense" | "pending";
-  icon: React.ComponentType<{ size?: number }>;
-}) {
-  const styles = {
-    income: { icon: "bg-emerald-50 text-emerald-600", text: "text-emerald-700" },
-    expense: { icon: "bg-rose-50 text-rose-600", text: "text-rose-700" },
-    pending: { icon: "bg-amber-50 text-amber-600", text: "text-amber-700" },
-  }[tone];
-  return (
-    <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <span
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${styles.icon}`}
-      >
-        <Icon size={22} />
-      </span>
-      <div>
-        <p className="text-sm text-slate-500">{label}</p>
-        <p
-          className={`mt-0.5 whitespace-nowrap text-2xl font-semibold lg:text-xl ${styles.text}`}
-        >
-          {formatCurrency(value)}
-        </p>
-      </div>
     </div>
   );
 }
@@ -250,68 +215,4 @@ function dueStatus(dueDate: Date | null, today: string) {
     };
   }
   return { label: `Vence em ${date}`, className: "text-slate-400" };
-}
-
-function PersonIncomeTable({
-  data,
-}: {
-  data: Awaited<ReturnType<typeof getMonthIncomeByPerson>>;
-}) {
-  if (data.people.length === 0) {
-    return (
-      <p className="mt-4 text-sm text-slate-500">
-        Nenhuma entrada lançada neste mês.
-      </p>
-    );
-  }
-
-  // Só as categorias que tiveram valor no mês, para a tabela caber no celular.
-  const categories = data.categories.filter((c) =>
-    data.people.some((p) => p.byCategory[c.id] > 0)
-  );
-
-  return (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full text-sm">
-        <caption className="mb-2 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
-          Entradas deste mês
-        </caption>
-        <thead>
-          <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-            <th className="py-2 pr-4 font-medium">Pessoa</th>
-            {categories.map((c) => (
-              <th key={c.id} className="py-2 pr-4 text-right font-medium">
-                {c.name}
-              </th>
-            ))}
-            <th className="py-2 text-right font-medium">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.people.map((p) => (
-            <tr key={p.person} className="border-b border-slate-100 last:border-0">
-              <td className="py-2 pr-4 text-slate-800">
-                <span className="flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="h-2.5 w-2.5 rounded-sm"
-                    style={{ backgroundColor: PERSON_COLORS[p.person] }}
-                  />
-                  {PERSON_LABELS[p.person]}
-                </span>
-              </td>
-              {categories.map((c) => (
-                <td key={c.id} className="py-2 pr-4 text-right text-slate-600">
-                  {p.byCategory[c.id] > 0 ? formatCurrency(p.byCategory[c.id]) : "—"}
-                </td>
-              ))}
-              <td className="py-2 text-right font-medium text-slate-900">
-                {formatCurrency(p.total)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
 }

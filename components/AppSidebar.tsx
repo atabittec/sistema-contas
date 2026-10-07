@@ -10,6 +10,7 @@ import {
   Tags,
   LogOut,
   Wallet,
+  BarChart3,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -18,6 +19,7 @@ const NAV_LINKS = [
   { href: "/recorrentes", label: "Contas Fixas", icon: Repeat },
   { href: "/cartoes", label: "Cartões", icon: CreditCard },
   { href: "/categorias", label: "Categorias", icon: Tags },
+  { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
 ];
 
 function useIsActive(href: string) {
