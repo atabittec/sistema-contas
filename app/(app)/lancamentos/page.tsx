@@ -20,9 +20,9 @@ export default async function LancamentosPage({
 }) {
   const params = await searchParams;
   const month = params.month ?? currentCompetenceMonth();
-  const person = params.person as Person | undefined;
+  const person = (params.person || undefined) as Person | undefined;
   const categoryId = params.categoryId || undefined;
-  const type = params.type as EntryType | undefined;
+  const type = (params.type || undefined) as EntryType | undefined;
   const q = params.q?.trim() || undefined;
 
   const [transactions, categories] = await Promise.all([
