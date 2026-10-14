@@ -267,6 +267,18 @@ export async function getExpenseByCategory(competenceMonth: string) {
   return getCategoryTotalsForMonths(EntryType.EXPENSE, [competenceMonth]);
 }
 
+/** Todos os lançamentos de uma categoria num conjunto de meses, pra detalhar um total. */
+export async function getCategoryTransactionsForMonths(
+  categoryId: string,
+  monthList: string[]
+) {
+  return prisma.transaction.findMany({
+    where: { categoryId, competenceMonth: { in: monthList } },
+    include: { category: true },
+    orderBy: [{ competenceMonth: "desc" }, { createdAt: "desc" }],
+  });
+}
+
 /** Evolução mensal de uma categoria específica, para ver tendência (água, energia...). */
 export async function getCategoryMonthlyHistory(
   categoryId: string,
