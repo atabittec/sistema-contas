@@ -181,6 +181,7 @@ export default async function RelatoriosPage({
               </h3>
               <Link
                 href={`/relatorios?year=${year}&categoryId=${selectedCategoryId}`}
+                scroll={false}
                 className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800"
               >
                 <X size={14} />
@@ -243,6 +244,7 @@ export default async function RelatoriosPage({
               </h3>
               <Link
                 href={`/relatorios?year=${year}${selectedCategoryId ? `&categoryId=${selectedCategoryId}` : ""}${historyMonth ? `&historyMonth=${historyMonth}` : ""}`}
+                scroll={false}
                 className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800"
               >
                 <X size={14} />

@@ -37,7 +37,8 @@ export function CategoryHistoryChart({
     const month = !Number.isNaN(index) ? chartData[index]?.month : undefined;
     if (!month) return;
     router.push(
-      `/relatorios?year=${year}&categoryId=${categoryId}&historyMonth=${month}`
+      `/relatorios?year=${year}&categoryId=${categoryId}&historyMonth=${month}`,
+      { scroll: false }
     );
   }
 

@@ -33,7 +33,7 @@ export function CategoryBarChart({
     const params = new URLSearchParams(searchParams.toString());
     params.set("year", String(year));
     params.set("barCategoryId", entry.categoryId);
-    router.push(`/relatorios?${params.toString()}`);
+    router.push(`/relatorios?${params.toString()}`, { scroll: false });
   }
 
   return (
