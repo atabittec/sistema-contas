@@ -1,4 +1,5 @@
-import { ArrowDownCircle, ArrowUpCircle, Download, Scale } from "lucide-react";
+import Link from "next/link";
+import { ArrowDownCircle, ArrowUpCircle, Download, Scale, X } from "lucide-react";
 import {
   getCardMonthlyHistory,
   getCategories,
@@ -8,12 +9,15 @@ import {
   getIncomeByPersonSeriesForMonths,
   getSeriesForMonths,
   getSummaryForMonths,
+  getTransactions,
 } from "@/lib/data";
 import {
   currentYear,
+  formatCompetenceMonth,
   formatCurrency,
   monthsInYear,
   monthTickLabel,
+  PERSON_LABELS,
 } from "@/lib/format";
 import { EntryType } from "@prisma/client";
 import { YearSwitcher } from "@/components/YearSwitcher";
@@ -27,7 +31,11 @@ import { PersonIncomeTable } from "@/components/PersonIncomeTable";
 export default async function RelatoriosPage({
   searchParams,
 }: {
-  searchParams: Promise<{ year?: string; categoryId?: string }>;
+  searchParams: Promise<{
+    year?: string;
+    categoryId?: string;
+    historyMonth?: string;
+  }>;
 }) {
   const params = await searchParams;
   const year = Number(params.year) || currentYear();
@@ -56,6 +64,18 @@ export default async function RelatoriosPage({
     ? await getCategoryMonthlyHistory(selectedCategoryId, months)
     : [];
   const selectedCategory = allCategories.find((c) => c.id === selectedCategoryId);
+
+  const historyMonth =
+    params.historyMonth && months.includes(params.historyMonth)
+      ? params.historyMonth
+      : undefined;
+  const historyTransactions =
+    historyMonth && selectedCategoryId
+      ? await getTransactions({
+          categoryId: selectedCategoryId,
+          competenceMonth: historyMonth,
+        })
+      : [];
 
   const balancePositive = summary.balance >= 0;
 
@@ -136,7 +156,63 @@ export default async function RelatoriosPage({
             Nenhum lançamento em &quot;{selectedCategory?.name}&quot; em {year}.
           </p>
         ) : (
-          <CategoryHistoryChart data={categoryHistory} />
+          <CategoryHistoryChart
+            data={categoryHistory}
+            year={year}
+            categoryId={selectedCategoryId}
+            selectedMonth={historyMonth}
+          />
+        )}
+
+        {historyMonth && selectedCategoryId && (
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-slate-700">
+                {selectedCategory?.name} em {formatCompetenceMonth(historyMonth)}
+              </h3>
+              <Link
+                href={`/relatorios?year=${year}&categoryId=${selectedCategoryId}`}
+                className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800"
+              >
+                <X size={14} />
+                Fechar
+              </Link>
+            </div>
+            {historyTransactions.length === 0 ? (
+              <p className="text-sm text-slate-500">
+                Nenhum lançamento encontrado nesse mês.
+              </p>
+            ) : (
+              <ul className="divide-y divide-slate-200">
+                {historyTransactions.map((t) => (
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between gap-3 py-2 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <Link
+                        href={`/lancamentos/${t.id}`}
+                        className="font-medium text-slate-800 hover:text-brand"
+                      >
+                        {t.description}
+                      </Link>
+                      <span className="ml-2 text-xs text-slate-400">
+                        {PERSON_LABELS[t.person]}
+                        {t.cardName ? ` · ${t.cardName}` : ""}
+                      </span>
+                    </div>
+                    <span
+                      className={`shrink-0 font-medium ${
+                        t.type === "INCOME" ? "text-emerald-700" : "text-rose-700"
+                      }`}
+                    >
+                      {formatCurrency(t.amount)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </section>
 
