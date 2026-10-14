@@ -31,9 +31,10 @@ export function CategoryHistoryChart({
   const chartData = data.map((d) => ({ ...d, label: monthTickLabel(d.month) }));
 
   function handleClick(state: MouseHandlerDataParam) {
+    // activeIndex vem como string (ex: "9"), não número.
     const index =
-      typeof state.activeIndex === "number" ? state.activeIndex : undefined;
-    const month = index !== undefined ? chartData[index]?.month : undefined;
+      state.activeIndex != null ? Number(state.activeIndex) : NaN;
+    const month = !Number.isNaN(index) ? chartData[index]?.month : undefined;
     if (!month) return;
     router.push(
       `/relatorios?year=${year}&categoryId=${categoryId}&historyMonth=${month}`
