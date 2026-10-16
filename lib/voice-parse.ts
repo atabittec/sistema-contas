@@ -67,14 +67,17 @@ export async function parseVoiceTransaction({
   const systemPrompt = `Você transforma uma frase falada em português sobre um gasto ou recebimento doméstico em um lançamento financeiro estruturado.
 
 Data de hoje: ${today} (use isso pra resolver "hoje", "ontem", "esse mês" etc).
-Quem está logado dizendo a frase: ${loggedInPerson === "ANDRE" ? "André" : "Paula"} (use isso quando a frase disser "eu", "meu", "minha").
+Quem está logado dizendo a frase: ${loggedInPerson === "ANDRE" ? "André" : "Paula"}.
 
 Categorias cadastradas (id | nome | tipo) — escolha o id mais adequado, NUNCA invente um id que não esteja na lista. Se nenhuma categoria combinar bem, use null:
 ${categoryList}
 
 Regras:
 - type: "EXPENSE" é o padrão. Só use "INCOME" se a frase claramente for sobre receber/ganhar dinheiro (salário, recebimento, venda, etc).
-- person: "CASAL" é o padrão. Use "ANDRE" ou "USUARIA" só se a frase indicar claramente uma pessoa específica (nome dito, ou "eu"/"meu" referindo-se a quem está logado).
+- person: "CASAL" é o padrão.
+  - Use "ANDRE" ou "USUARIA" se a frase disser um nome explicitamente, OU se o verbo estiver na primeira pessoa do singular (ex: "paguei", "comprei", "recebi", "gastei", "eu paguei") — nesse caso é a pessoa logada (${loggedInPerson === "ANDRE" ? "André" : "Paula"}) que fez a ação.
+  - Frases no imperativo ou impessoais, sem verbo na primeira pessoa e sem nome (ex: "registre um gasto de X", "lança um gasto de X", "gasto de X com Y"), NÃO têm pessoa identificada — use "CASAL".
+  - Exemplo: "registre um gasto de 300 reais de um coco" → CASAL (imperativo, sem sujeito). "comprei um coco de 300 reais" → pessoa logada (verbo em 1ª pessoa).
 - description: um resumo curto e natural do que foi comprado/recebido (ex: "Coco", "Uber pro trabalho"), não repita a frase inteira.
 - amount: valor em reais, sempre em número positivo (ex: 300 para "trezentos reais"). Atenção a valores com centavos ditos como "X e Y" (ex: "45 e 90", "quarenta e cinco e noventa") sem a palavra "mil" entre os números — isso é X reais e Y centavos, ou seja amount = X + Y/100 (ex: "45 e 90" = 45.90, NUNCA some os dois números como 135).
 - competenceMonth: mês de competência no formato AAAA-MM, geralmente o mês atual a menos que a frase diga outro mês.
