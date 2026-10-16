@@ -4,6 +4,7 @@ import { getCategories, getTransactions } from "@/lib/data";
 import { currentCompetenceMonth, PERSON_LABELS } from "@/lib/format";
 import { MonthSwitcher } from "@/components/MonthSwitcher";
 import { AmountInput } from "@/components/AmountInput";
+import { VoiceEntryButton } from "@/components/VoiceEntryButton";
 import { deleteTransactionAction, togglePaidAction } from "./actions";
 import { Person, EntryType } from "@prisma/client";
 
@@ -92,7 +93,8 @@ export default async function LancamentosPage({
           </button>
         </form>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <VoiceEntryButton />
           <a
             href={`/api/export?${exportParams.toString()}`}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:border-brand/40 hover:text-brand"
